@@ -16,7 +16,7 @@ func Init() {
 	if err != nil {
 		log.Fatal("Could not connect to database:", err)
 	}
-
+	database.CreateDB(Db)
 	// 设置路由
 	r := router.SetupRouter(Db)
 

@@ -7,7 +7,7 @@ import (
 
 func Link() (*sql.DB, error) {
 	// 连接到 MySQL 数据库
-	db, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/SteelAmbition")
+	db, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/mysql")
 	if err != nil {
 		return nil, err
 	}
