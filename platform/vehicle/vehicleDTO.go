@@ -1,8 +1,7 @@
 package vehicle
 
 type VehicleDTO struct {
-	VehicleID               int
-	UserID                  int
+	UserID                  uint
 	VehicleName             string `json:"vehicle_name" binding:"required"`
 	CoreMoudle_Weight       int    `json:"core_w" binding:"required"`
 	CoreMoudle_Energy       int    `json:"core_e" binding:"required"`

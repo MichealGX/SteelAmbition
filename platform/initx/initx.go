@@ -1,13 +1,13 @@
 package initx
 
 import (
-	"database/sql"
+	"gorm.io/gorm"
 	"log"
 	"platform/database"
 	"platform/router"
 )
 
-var Db *sql.DB
+var Db *gorm.DB
 
 func Init() {
 	// 链接数据库
@@ -16,6 +16,7 @@ func Init() {
 	if err != nil {
 		log.Fatal("Could not connect to database:", err)
 	}
+	database.Cleanup(Db) //测试阶段清理数据库
 	database.CreateDB(Db)
 	// 设置路由
 	r := router.SetupRouter(Db)

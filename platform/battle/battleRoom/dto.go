@@ -1,14 +1,18 @@
 package battleRoom
 
+import "gorm.io/gorm"
+
 type RoomDTO struct {
-	UserID      int
-	UserName    string
-	VehicleID   int
-	VehicleName string
-	ReadyFlag   bool
+	gorm.Model
+	UserID      uint
+	UserName    string `json:"UserName"`
+	VehicleID   uint   `json:"VehicleID"`
+	VehicleName string `json:"VehicleName"`
+	ReadyFlag   bool   `json:"ReadyFlag"`
 }
 
 type RoomListDTO struct {
-	RoomID int
+	gorm.Model
 	MaxNum int `json:"maxNum"`
+	Num    int
 }
