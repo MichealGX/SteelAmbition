@@ -11,7 +11,8 @@ import (
 func Login(c *gin.Context, db *gorm.DB, userDTO UserDTO) {
 	// 查询用户
 	var user database.User
-	if err := db.Table("users").Where("user_name = ? AND Password = ?", userDTO.UserName, userDTO.Password).First(&user).Error; err != nil {
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Model(database.User{}).Where("user_name = ? AND password = ?", userDTO.UserName, userDTO.Password).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"code": 1, "msg": "Unauthorized"})
 		return
 	}

@@ -1,6 +1,8 @@
 package battleRoom
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type RoomDTO struct {
 	gorm.Model
@@ -9,10 +11,15 @@ type RoomDTO struct {
 	VehicleID   uint   `json:"VehicleID"`
 	VehicleName string `json:"VehicleName"`
 	ReadyFlag   bool   `json:"ReadyFlag"`
+	Survive     bool   `json:"Survive"`
 }
 
 type RoomListDTO struct {
 	gorm.Model
-	MaxNum int `json:"maxNum"`
-	Num    int
+	MaxNum      int `json:"maxNum"`
+	Num         int
+	Status      int
+	Survival    int
+	TimeLimit   int
+	DamageValue int
 }

@@ -45,9 +45,12 @@ type BattleRecord struct {
 // RoomList 对战房间列表表模型
 type RoomList struct {
 	gorm.Model
-	MaxNum int
-	Num    int
-	Status int
+	MaxNum      int
+	Num         int
+	Status      int
+	Survival    int
+	TimeLimit   int
+	DamageValue int
 }
 
 // RoomData 对战房间数据表模型
@@ -58,4 +61,5 @@ type RoomData struct {
 	VehicleID   uint
 	VehicleName string
 	ReadyFlag   bool
+	Survive     bool
 }

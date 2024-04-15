@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
 	"platform/database"
 
@@ -12,8 +11,8 @@ import (
 func Register(c *gin.Context, db *gorm.DB, userDTO UserDTO) {
 	// 检查用户名是否已存在
 	var count int64
+	db = db.Session(&gorm.Session{NewDB: true})
 	if err := db.Model(database.User{}).Where("user_name = ?", userDTO.UserName).Count(&count).Error; err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to query database"})
 		return
 	}
@@ -28,6 +27,7 @@ func Register(c *gin.Context, db *gorm.DB, userDTO UserDTO) {
 		Password: userDTO.Password,
 		Email:    userDTO.Email,
 	}
+	db = db.Session(&gorm.Session{NewDB: true})
 	if err := db.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to insert user"})
 		return

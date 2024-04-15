@@ -12,8 +12,9 @@ func InsertRoomRole(c *gin.Context, db *gorm.DB, roomData database.RoomData, roo
 	// 插入战斗房间角色
 	//query := fmt.Sprintf("INSERT INTO RoomData_%d (user_id, user_name, vehicle_id, vehicle_name, ready_flag) VALUES (?, ?, ?, ?, ?)", roomData.ID)
 	//err := db.Exec(query, roomData.UserID, roomData.UserName, roomData.VehicleID, roomData.VehicleName, roomData.ReadyFlag).Error
+	db = db.Session(&gorm.Session{NewDB: true})
 	query := fmt.Sprintf("RoomData_%d", int(roomID))
-	err := db.Table(query).Create(&roomData).Error
+	err := db.Table(query).Model(database.RoomData{}).Create(&roomData).Error
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to insert roomData"})

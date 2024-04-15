@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func Cleanup(db *gorm.DB) {
+func CleanUp(db *gorm.DB) {
 	// 使用 "SteelAmbition" 数据库
 	err := db.Exec("USE SteelAmbition").Error
 	if err != nil {
@@ -17,4 +17,5 @@ func Cleanup(db *gorm.DB) {
 		panic(err)
 	}
 	db.Exec("DROP TABLE IF EXISTS RoomData_1")
+	db.Exec("DROP TABLE IF EXISTS RoomData_2")
 }

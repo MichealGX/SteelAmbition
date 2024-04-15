@@ -7,19 +7,23 @@ import (
 	"net/http"
 	"platform/database"
 	"strconv"
-	"time"
 )
 
 func JoinRoom(c *gin.Context, db *gorm.DB, roomDTO RoomDTO, roomID uint) {
+	// 在进行下一次查询前，清除字段选择
+	db = db.Session(&gorm.Session{NewDB: true})
+	// 或者使用 Select("*") 来重置字段选择
+	// db = db.Select("*")
+
 	// 检查房间是否存在
 	var roomList database.RoomList
-	if err := db.First(&roomList, roomID).Error; err != nil {
+	if err := db.Table("room_lists").Model(database.RoomList{}).First(&roomList, roomID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 1, "msg": "Room does not exist"})
 		return
 	}
 
 	// 检查userID是否已经在房间中
-	//var roomData database.RoomData
+	db = db.Session(&gorm.Session{NewDB: true})
 	var count int64
 	if err := db.Table("RoomData_"+strconv.Itoa(int(roomList.ID))).Where("user_id = ?", roomDTO.UserID).Count(&count).Error; err != nil {
 		fmt.Println(err)
@@ -56,9 +60,8 @@ func JoinRoom(c *gin.Context, db *gorm.DB, roomDTO RoomDTO, roomID uint) {
 		VehicleID:   roomDTO.VehicleID,
 		VehicleName: roomDTO.VehicleName,
 		ReadyFlag:   roomDTO.ReadyFlag,
+		Survive:     roomDTO.Survive,
 	}
-	roomData.CreatedAt = time.Now()
-	roomData.UpdatedAt = time.Now()
 	err := InsertRoomRole(c, db, roomData, roomID)
 	if err != nil {
 		return
@@ -69,13 +72,6 @@ func JoinRoom(c *gin.Context, db *gorm.DB, roomDTO RoomDTO, roomID uint) {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to update roomID"})
 		return
 	}
-
-	//// 查询数据库中的房间信息
-	//var roomArray []database.RoomData
-	//if err := db.Model(&database.RoomData{}).Where("id = ?", roomID).Find(&roomArray).Error; err != nil {
-	//	c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to query database"})
-	//	return
-	//}
 
 	// 返回房间信息
 	var roomArray []database.RoomData

@@ -11,6 +11,7 @@ import (
 func TraverseRoom(c *gin.Context, db *gorm.DB, roomID uint, roomArray *[]database.RoomData) error {
 	// 遍历房间
 	query := "RoomData_" + strconv.Itoa(int(roomID))
+	db = db.Session(&gorm.Session{NewDB: true})
 	err := db.Table(query).Model(database.RoomData{}).Find(roomArray).Error
 	if err != nil {
 		fmt.Println(err)
