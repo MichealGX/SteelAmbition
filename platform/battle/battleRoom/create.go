@@ -1,39 +1,66 @@
 package battleRoom
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
+	"platform/database"
 )
 
-func Create(c *gin.Context, Db *sql.DB, roomDTO RoomDTO, roomListDTO RoomListDTO) {
-	// 插入新房间到RoomList表,生成房间ID
-	result, err := Db.Exec("INSERT INTO RoomList (MaxNum) VALUES (?)", roomListDTO.MaxNum)
-	if err != nil {
-		fmt.Println(err)
+func CreateRoom(c *gin.Context, db *gorm.DB, roomDTO RoomDTO, roomListDTO RoomListDTO) {
+	// 插入新房间到 RoomList 表，生成房间ID
+	roomList := database.RoomList{
+		MaxNum:   roomListDTO.MaxNum,
+		Num:      roomListDTO.Num,
+		Status:   roomListDTO.Status,
+		Survival: roomListDTO.Survival,
+	}
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Create(&roomList).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to insert room"})
 		return
 	}
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to get roomID"})
-		return
-	}
-	// 将获取到的 ID 赋值给 roomListDTO.RoomID
-	roomListDTO.RoomID = int(lastInsertID)
 
 	// 创建新的数据表，例如 RoomData_123
-	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS RoomData_%d (UserID INT, UserName VARCHAR(255), VehicleID INT, VehicleName VARCHAR(255), ReadyFlag BOOLEAN, PRIMARY KEY (UserID))", roomListDTO.RoomID)
-	_, err = Db.Exec(query)
-	if err != nil {
-		fmt.Println(err)
+	db = db.Session(&gorm.Session{NewDB: true})
+	roomDataTableName := fmt.Sprintf("RoomData_%d", roomList.ID)
+	if err := db.Table(roomDataTableName).AutoMigrate(&database.RoomData{}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to create room"})
 		return
 	}
-	//根据vehicleID获取vehicleName
-	err = Db.QueryRow("SELECT VehicleName FROM Vehicle WHERE VehicleID = ?", roomDTO.VehicleID).Scan(&roomDTO.VehicleName)
-	//为新房间插入房主信息
-	_, err = Db.Exec(fmt.Sprintf("INSERT INTO RoomData_%d (UserID, UserName, VehicleID, VehicleName, ReadyFlag) VALUES (?, ?, ?, ?, ?)", roomListDTO.RoomID), roomDTO.UserID, roomDTO.UserName, roomDTO.VehicleID, roomDTO.VehicleName, false)
-	c.JSON(http.StatusCreated, gin.H{"code": 0, "msg": "success"})
+
+	// 将 RoomID 存入 User 表
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Table("users").Model(database.User{}).Where("id = ?", roomDTO.UserID).Update("room_id", roomList.ID).Error; err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to update roomID"})
+		return
+	}
+
+	// 根据 vehicleID 获取 vehicleName
+	var vehicleName string
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Table("vehicles").Model(database.Vehicle{}).Where("id = ?", roomDTO.VehicleID).Pluck("vehicle_name", &vehicleName).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to get vehicleName"})
+		return
+	}
+	roomDTO.VehicleName = vehicleName
+
+	// 为新房间插入房主信息
+	roomData := database.RoomData{
+		UserID:      roomDTO.UserID,
+		UserName:    roomDTO.UserName,
+		VehicleID:   roomDTO.VehicleID,
+		VehicleName: roomDTO.VehicleName,
+		ReadyFlag:   roomDTO.ReadyFlag,
+		Survive:     roomDTO.Survive,
+	}
+	err := InsertRoomRole(c, db, roomData, roomList.ID)
+	if err != nil {
+		return
+	}
+
+	roomArray := []database.RoomData{roomData}
+	c.JSON(http.StatusCreated, gin.H{"code": 0, "msg": "success", "data": roomArray, "Num": roomListDTO.Num})
 }

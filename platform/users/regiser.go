@@ -1,18 +1,18 @@
 package users
 
 import (
-	"database/sql"
-	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
+	"platform/database"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func Register(c *gin.Context, Db *sql.DB, userDTO UserDTO) {
+func Register(c *gin.Context, db *gorm.DB, userDTO UserDTO) {
 	// 检查用户名是否已存在
-	var count int
-	row := Db.QueryRow("SELECT COUNT(*) FROM User WHERE Username = ?", userDTO.UserName)
-	if err := row.Scan(&count); err != nil {
-		log.Println("Failed to query database:", err)
+	var count int64
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Model(database.User{}).Where("user_name = ?", userDTO.UserName).Count(&count).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to query database"})
 		return
 	}
@@ -22,8 +22,13 @@ func Register(c *gin.Context, Db *sql.DB, userDTO UserDTO) {
 	}
 
 	// 插入新用户到数据库
-	_, err := Db.Exec("INSERT INTO User (Username, Password, Email) VALUES (?, ?, ?)", userDTO.UserName, userDTO.Password, userDTO.Email)
-	if err != nil {
+	user := database.User{
+		UserName: userDTO.UserName,
+		Password: userDTO.Password,
+		Email:    userDTO.Email,
+	}
+	db = db.Session(&gorm.Session{NewDB: true})
+	if err := db.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 1, "msg": "Failed to insert user"})
 		return
 	}

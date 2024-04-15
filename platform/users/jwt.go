@@ -5,14 +5,15 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"platform/database"
 	"strings"
 	"time"
 )
 
-func SignedToken(user UserDTO) (string, error) {
+func SignedToken(user database.User) (string, error) {
 	// 创建声明（Claim）
 	claims := jwt.MapClaims{
-		"user_id":  user.UserID,
+		"user_id":  user.ID,
 		"username": user.UserName,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // 过期时间，这里设置为 24 小时后
 	}
@@ -83,8 +84,8 @@ func AuthMiddleware() gin.HandlerFunc {
 func ExtractUser(c *gin.Context) UserDTO {
 	user := c.MustGet("user").(jwt.MapClaims)
 	userDTO := UserDTO{
-		UserID:   int(user["user_id"].(float64)),
 		UserName: user["username"].(string),
 	}
+	userDTO.ID = uint(int(user["user_id"].(float64)))
 	return userDTO
 }
