@@ -1,0 +1,23 @@
+
+.my-page {
+  padding: 20px;
+}
+.avatar-container {
+  text-align: center;
+}
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.menu-list {
+  margin-top: 20px;
+}
+.menu-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+.menu-item:last-child {
+  border-bottom: none;
+}

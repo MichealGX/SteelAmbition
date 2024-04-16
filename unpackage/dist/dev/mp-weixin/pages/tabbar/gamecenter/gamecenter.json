@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "游戏大厅",
+  "navigationBarBackgroundColor": "#00b783",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

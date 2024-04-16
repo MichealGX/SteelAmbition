@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/tabbar/index/index",
+    "pages/tabbar/gamecenter/gamecenter",
+    "pages/tabbar/rank/rank",
+    "pages/tabbar/mine/mine",
+    "pages/login/login"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#00b783",
+    "backgroundColor": "white",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/tabbar/index/index",
+        "text": "首页",
+        "iconPath": "static/tabar1.png",
+        "selectedIconPath": "static/tabaron1.png"
+      },
+      {
+        "pagePath": "pages/tabbar/gamecenter/gamecenter",
+        "text": "游戏大厅",
+        "iconPath": "static/tabar2.png",
+        "selectedIconPath": "static/tabaron2.png"
+      },
+      {
+        "pagePath": "pages/tabbar/rank/rank",
+        "text": "排行榜",
+        "iconPath": "static/tabar3.png",
+        "selectedIconPath": "static/tabaron3.png"
+      },
+      {
+        "pagePath": "pages/tabbar/mine/mine",
+        "text": "我的",
+        "iconPath": "static/tabar4.png",
+        "selectedIconPath": "static/tabaron4.png"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

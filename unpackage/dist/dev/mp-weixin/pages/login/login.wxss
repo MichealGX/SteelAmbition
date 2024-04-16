@@ -1,0 +1,10 @@
+
+.active {
+		color: #2e8726;
+}
+.view {
+		text-align: center;
+}
+input{
+    margin-top: 15px;
+}
