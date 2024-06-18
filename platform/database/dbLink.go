@@ -8,7 +8,7 @@ import (
 
 func Link() (*gorm.DB, error) {
 	// 连接MySQL服务器
-	dsn := "root:123456@tcp(localhost:3306)/?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "user0:zx123456@tcp(121.36.4.215:3306)/SteelAmbition?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		//PrepareStmt: true,
 	})
